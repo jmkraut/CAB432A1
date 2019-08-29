@@ -14,23 +14,36 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-axios.get("https://api.ipdata.co/?api-key=74dc719f974815bd528cf30c7bc844f6bbf550b4357db6dd5537bae1")
-.then(function (response) {
-  axios.get("https://api.darksky.net/forecast/8871d1e0a911accaa06df49bd016b42e/" + 
-  response.data.latitude + "," + response.data.longitude)
-  .then(function(res) {
-    summary = res.data.currently.summary
-  })
-  .catch(function(err){
-    console.log(err)
-  })
-})
-.catch(function(error){
-  console.log(error);
-})
 
 app.get('/', function (req, res) {
-  res.send(summary)
+
+  axios.get("https://api.ipdata.co/?api-key=74dc719f974815bd528cf30c7bc844f6bbf550b4357db6dd5537bae1")
+
+  .then(function (response) {
+    axios.get("https://api.darksky.net/forecast/8871d1e0a911accaa06df49bd016b42e/" + 
+    response.data.latitude + "," + response.data.longitude)
+
+    .then(function(res) {
+      summary = res.data.currently.summary
+
+      .then(function(res) {
+        axios.get("https://app.ticketmaster.com/discovery/v2/events.json?apikey=4OMcMtE7RsqOGgvSIuMpVPKQMmf4IHib&latlong=" + res.data.latitude + "," + res.data.longitude)
+      })
+
+      .catch(function(err){
+        console.log(err)
+      })
+    })
+    .catch(function(err){
+      console.log(err)
+    })
+  })
+  .catch(function(error){
+    console.log(error);
+  })
+
+  res.send(summary);
+
 })
 
 app.listen(3000, () => 
