@@ -16,7 +16,7 @@ function App(){
     {/* Top Navbar Construction */}
       <Navbar bg="dark" variant="dark" className="Topbar">
     <Navbar.Brand>
-      EventWeather
+      <h1>EventWeather</h1>
     </Navbar.Brand>
   </Navbar>
 
