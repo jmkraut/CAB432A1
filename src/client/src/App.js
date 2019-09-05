@@ -5,9 +5,9 @@ import Image from 'react-bootstrap/Image'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import ds from './ds.png'
-import ipdata from './favicon.ico'
-import tm from './tm.png'
+import ds from './images/ds.png'
+import ipdata from './images/favicon.ico'
+import tm from './images/tm.png'
 
 
 function App(){

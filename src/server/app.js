@@ -6,10 +6,8 @@ const logger = require('morgan');
 const server = express();
 const axios = require('axios');
 const bodyParser = require('body-parser')
-let summary = "";
 let latitude = "";
 let longitude = "";
-let event = "";
 
 
 
