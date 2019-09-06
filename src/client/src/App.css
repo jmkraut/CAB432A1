@@ -9,18 +9,10 @@
   font-size: 2em;
 }
 
-.CardTest{
-  margin: 10px;
-}
-
 .WeatherCard{
   font-size: 20px;
   margin: 0px;
   background-color: whitesmoke;
-}
-
-.WeatherSpinner{
-  justify-content: center;
 }
 
 body{
