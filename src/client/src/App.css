@@ -13,7 +13,21 @@
   margin: 10px;
 }
 
+.WeatherCard{
+  font-size: 20px;
+  margin: 0px;
+  background-color: whitesmoke;
+}
+
+.WeatherSpinner{
+  justify-content: center;
+}
+
 body{
   background-color: whitesmoke;
   font-family: 'Livvic', sans-serif;
+}
+
+.NavCard{
+  font-size: 1em;
 }
