@@ -18,15 +18,15 @@ let images = [];
 let info = [];
 let urls = [];
 let venues = [];
-let cards = [];
+let dates = [];
 
 function App() {
   const [temp, setTemp] = useState("");
   const [city, setCity] = useState("");
   const [hidden, setHidden] = useState(false);
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
   const [icon, setIcon] = useState("");
+  const [summary, setSummary] = useState("");
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:3001/")
@@ -38,115 +38,97 @@ function App() {
           info.push(res.ticketmaster._embedded.events[i].info);
           urls.push(res.ticketmaster._embedded.events[i].url);
           venues.push(res.ticketmaster._embedded.events[i]._embedded.venues[0].name);
-          
+          dates.push(res.ticketmaster._embedded.events[i].dates.start.localDate.split("-").reverse().join("-"))
         }
         setHidden(true);
         setTemp(((res.darksky.currently.temperature - 32) / 1.8).toFixed(0));
         setCity(res.ipdata.city);
-        setTitle(res.ticketmaster._embedded.events[0].name);
-        setImage(res.ticketmaster._embedded.events[0].images[1].url);
         setIcon(res.darksky.currently.icon.replace(/-/g, "_").toUpperCase());
+        setSummary(res.darksky.currently.summary)
       })
       .then(() => {
-            for (let i = 0; i < names.length; i++) {
-              cards.push(
-                <Card style={{ width: "18rem" }}>
-                  <Card.Header>
-                    <strong>{title}</strong>
-                  </Card.Header>
-                  <Card.Img variant="top" src={images[i]} />
-                  <br />
-                  <Card.Title>{venues[i]}</Card.Title>
-                  <Card.Body>
-                    <Card.Text>{info[i]}</Card.Text>
-                  </Card.Body>
-                  <Card.Footer>
-                    <Card.Link href={urls[i]}>{urls[i]}</Card.Link>
-                  </Card.Footer>
-                </Card>
-              );
-        }
-        
-        console.log(cards)
+        let tempcards = [];
+
+        for (let i = 0; i < names.length; i++) {
+          tempcards.push(
+            <Card style={{ width: "18rem" }} className="card">
+              <Card.Header>{names[i]}</Card.Header>
+              <Card.Img variant="top" className ="card-image" src={images[i]} />
+              <br />
+              <Card.Title>{venues[i]}</Card.Title>
+              <Card.Title>{dates[i]}</Card.Title>
+              <Card.Body className="card-info">
+                <Card.Text>{info[i]}</Card.Text>
+              </Card.Body>
+              <Card.Footer>
+                <Card.Link href={urls[i]}>{urls[i]}</Card.Link>
+              </Card.Footer>
+            </Card>
+          );
+    }
+
+    setCards(tempcards)
+
       })
-      .catch(error => {
-        console.log(error);
-      });
   }, []);
 
   return (
     <div>
       {/* Top Navbar Construction */}
-      <Navbar className="Topbar" bg="dark" variant="dark">
+      <Navbar className="Topbar" bg="dark" variant="dark" sticky="top">
+        <Container>
+
+        <Col xs={1} l={1}>
+        <Navbar.Brand>
+                <h1>EventWeather</h1>
+                <h6>Events and weather for your day out.</h6>
+        </Navbar.Brand>
+        </Col>
+        <Col xs={1}>
         <Navbar.Brand>
           <ReactAnimatedWeather
             icon={icon}
             color="white"
-            size="128"
+            size={64}
             animate={true}
           />
         </Navbar.Brand>
+        </Col>
 
-        <Navbar.Brand>
-            <ul style={{ listStyleType: "none" }}>
-              <li>
-                <h1>EventWeather</h1>
-                <h6>Events and weather for your day out.</h6>
-              </li>
-              <li>
-                <strong>{city}</strong>
-              </li>
-              <li>
+        <Col xs={1} className="weather-report">
+        <br/>
+        <strong>{city}</strong> <br/>
+                {summary}
                 <p>{temp} °C</p>
-              </li>
-            </ul>
-        </Navbar.Brand>
+        </Col>
+        </Container>
       </Navbar>
 
-      {/* <Card style={{ width: "18rem" }}>
-        <Card.Header>
-          <strong>{title}</strong>
-        </Card.Header>
-        <Card.Img variant="top" src={images[0]} />
-        <br />
-        <Card.Title>{venues[0]}</Card.Title>
-        <Card.Body>
-          <Card.Text>{info[0]}</Card.Text>
-        </Card.Body>
-        <Card.Footer>
-          <Card.Link href={urls[0]}>{urls[0]}</Card.Link>
-        </Card.Footer>
-      </Card> */}
-      <React.Fragment>{cards}</React.Fragment>
-      <ol>
-        {cards.map(card => (
-          <li key={card}>{card}</li>
-        ))}
-      </ol>
+      <CardColumns className="card-columns">
+          {cards}
+      </CardColumns>
 
       {/* Bottom Navbar Construction */}
-      <Navbar bg="dark" variant="dark" fixed="bottom">
-        <Navbar.Brand>
+      <Navbar bg="dark" variant="dark" sticky="bottom">
           {/* Container to hold the API powered by images */}
           <Container>
             <Row>
               {/* Darksky API */}
-              <Col xs={3} md={3} lg={2} sm={3}>
+              <Col xs={2} md={1} lg={1} sm={2}>
                 <Image className="darksky" src={ds} alt={"ds"} fluid />
               </Col>
 
               {/* IPData.co API */}
-              <Col xs={2} md={2} lg={1} sm={2}>
+              <Col xs={2} md={1} lg={1} sm={2}>
                 <Image className="ipdata" src={ipdata} alt={"ipdata"} fluid />
               </Col>
 
               {/* Ticketmaster API */}
-              <Col xs={3} md={3} lg={3} sm={3}>
+              <Col xs={3} md={2} lg={2} sm={3}>
                 <Image className="tm" src={tm} alt={"tm"} fluid />
               </Col>
             </Row>
           </Container>
-        </Navbar.Brand>
       </Navbar>
     </div>
   );
