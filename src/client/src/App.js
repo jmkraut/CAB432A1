@@ -13,6 +13,8 @@ import ds from "./images/ds.png";
 import ipdata from "./images/favicon.ico";
 import tm from "./images/tm.png";
 
+
+//Arrays that are required for the cards 
 let names = [];
 let images = [];
 let info = [];
@@ -21,6 +23,8 @@ let venues = [];
 let dates = [];
 
 function App() {
+
+  //These hooks populate the page after it has already loaded.
   const [temp, setTemp] = useState("");
   const [city, setCity] = useState("");
   const [hidden, setHidden] = useState(false);
@@ -32,6 +36,8 @@ function App() {
     fetch("http://localhost:3001/")
       .then(res => res.json())
       .then(res => {
+
+        //Places the data into arrays for the cards array
         for (let i = 0; i < res.ticketmaster._embedded.events.length; i++) {
           names.push(res.ticketmaster._embedded.events[i].name);
           images.push(res.ticketmaster._embedded.events[i].images[1].url);
@@ -40,15 +46,18 @@ function App() {
           venues.push(res.ticketmaster._embedded.events[i]._embedded.venues[0].name);
           dates.push(res.ticketmaster._embedded.events[i].dates.start.localDate.split("-").reverse().join("-"))
         }
+
         setHidden(true);
-        setTemp(((res.darksky.currently.temperature - 32) / 1.8).toFixed(0));
+        setTemp(((res.darksky.currently.temperature - 32) / 1.8).toFixed(1));
         setCity(res.ipdata.city);
         setIcon(res.darksky.currently.icon.replace(/-/g, "_").toUpperCase());
         setSummary(res.darksky.currently.summary)
       })
       .then(() => {
+        // Holds the information before the Hook populates the cards array
         let tempcards = [];
 
+        // Populates the tempcards array
         for (let i = 0; i < names.length; i++) {
           tempcards.push(
             <Card style={{ width: "18rem" }} className="card">
@@ -67,6 +76,7 @@ function App() {
           );
     }
 
+    // Hook that populates the actual cards array
     setCards(tempcards)
 
       })
@@ -76,59 +86,66 @@ function App() {
     <div>
       {/* Top Navbar Construction */}
       <Navbar className="Topbar" bg="dark" variant="dark" sticky="top">
+        {/* Separate the navbar into 3 columns */}
         <Container>
-
-        <Col xs={1} l={1}>
-        <Navbar.Brand>
+          {/* Navbar Title */}
+          <Row>
+            <Col md="auto">
+              <Navbar.Brand>
                 <h1>EventWeather</h1>
                 <h6>Events and weather for your day out.</h6>
-        </Navbar.Brand>
-        </Col>
-        <Col xs={1}>
-        <Navbar.Brand>
-          <ReactAnimatedWeather
-            icon={icon}
-            color="white"
-            size={64}
-            animate={true}
-          />
-        </Navbar.Brand>
-        </Col>
-
-        <Col xs={1} className="weather-report">
-        <br/>
-        <strong>{city}</strong> <br/>
-                {summary}
-                <p>{temp} °C</p>
-        </Col>
+              </Navbar.Brand>
+            </Col>
+            {/* Animated weather icon */}
+            <Col md="auto">
+              <Navbar.Brand>
+                <ReactAnimatedWeather
+                  icon={icon}
+                  color="white"
+                  size={64}
+                  animate={true}
+                />
+              </Navbar.Brand>
+            </Col>
+            {/* Weather report section */}
+            <Col md="auto" className="weather-report">
+              <strong>{city}</strong>
+            </Col>
+            <Col md="auto" className="weather-report">
+              {summary}
+            </Col>
+            <Col md="auto" className="weather-report">
+              {" "}
+              {temp} °C
+            </Col>
+          </Row>
         </Container>
       </Navbar>
 
-      <CardColumns className="card-columns">
-          {cards}
-      </CardColumns>
+      {/* Renders the cards array into the columns */}
+      <CardColumns className="card-columns">{cards}</CardColumns>
 
       {/* Bottom Navbar Construction */}
       <Navbar bg="dark" variant="dark" sticky="bottom">
-          {/* Container to hold the API powered by images */}
-          <Container>
-            <Row>
-              {/* Darksky API */}
-              <Col xs={2} md={1} lg={1} sm={2}>
-                <Image className="darksky" src={ds} alt={"ds"} fluid />
-              </Col>
+        {/* Container to hold the API powered by images */}
+        <Container>
+          <Row>
+            {/* Darksky API */}
+            <Col xs={2} md={1} lg={1} sm={2}>
+              <Image className="darksky" src={ds} alt={"ds"} fluid />
+            </Col>
 
-              {/* IPData.co API */}
-              <Col xs={2} md={1} lg={1} sm={2}>
-                <Image className="ipdata" src={ipdata} alt={"ipdata"} fluid />
-              </Col>
+            {/* IPData.co API */}
+            <Col xs={2} md={1} lg={1} sm={2}>
+              <Image className="ipdata" src={ipdata} alt={"ipdata"} fluid />
+            </Col>
 
-              {/* Ticketmaster API */}
-              <Col xs={3} md={2} lg={2} sm={3}>
-                <Image className="tm" src={tm} alt={"tm"} fluid />
-              </Col>
-            </Row>
-          </Container>
+            {/* Ticketmaster API */}
+            <Col xs={3} md={2} lg={2} sm={3}>
+              <Image className="tm" src={tm} alt={"tm"} fluid />
+            </Col>
+          </Row>
+        </Container>
       </Navbar>
     </div>
   );
