@@ -36,7 +36,8 @@
 
 .weather-report{
   color: white;
-  font-size: 15px;
+  font-size: 20px;
+  margin-top: 25px;
 }
 
 body{

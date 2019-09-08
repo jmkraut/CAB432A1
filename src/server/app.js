@@ -7,8 +7,9 @@ const helmet = require("helmet");
 const logger = require('morgan');
 const server = express();
 const axios = require('axios');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const requestIP = require('request-ip');
+const d2d = require('degrees-to-direction')
 
 //Variables required to parse into some of the APIs
 let latitude = "";
@@ -26,6 +27,7 @@ let returnJSON = {
       Summary:{},
       Temperature: {},
       Wind: {},
+      WindBearing: {},
       Icon: {}
     },
   },
@@ -70,8 +72,8 @@ server.get('/', (req, res) => {
 
       //City variable for the ticketmaster API
       //and placing it into the JSON object to be returned
-      city = response.data.city
-      returnJSON.Ipdata.City = response.data.city
+      city = response.data.city;
+      returnJSON.Ipdata.City = response.data.city;
       
       //Call to the Darksky API and map data to the
       //JSON object to be returned.
@@ -90,7 +92,9 @@ server.get('/', (req, res) => {
           //Corrects the format from e.g clear-day to
           //CLEAR_DAY for the front end.
           returnJSON.Darksky.Currently.Icon = response.data.currently.icon.replace(/-/g, "_").toUpperCase();
-        
+
+          returnJSON.Darksky.Currently.WindBearing = (d2d(response.data.currently.windBearing))
+
           //Call to the Ticketmaster API and map data to the
           //JSON object to be returned. Once complete returns
           //the JSON object.
@@ -101,19 +105,25 @@ server.get('/', (req, res) => {
           //what is required for the front end.
             for(let i = 0; i < response.data._embedded.events.length; i++){
 
-              returnJSON.Ticketmaster.Names[i] = response.data._embedded.events[i].name
+              returnJSON.Ticketmaster.Names[i] =
+                response.data._embedded.events[i].name
               
-              returnJSON.Ticketmaster.Venues[i] = response.data._embedded.events[i]._embedded.venues[0].name
+              returnJSON.Ticketmaster.Venues[i] =
+                response.data._embedded.events[i]._embedded.venues[0].name
               
               //The split and reverse corrects the format
               // from yyyy-mm-dd to dd-mm-yyyy
-              returnJSON.Ticketmaster.Dates[i] = response.data._embedded.events[i].dates.start.localDate.split("-").reverse().join("-")
+              returnJSON.Ticketmaster.Dates[i] =
+                response.data._embedded.events[i].dates.start.localDate.split("-").reverse().join("-")
 
-              returnJSON.Ticketmaster.Info[i] = response.data._embedded.events[i].info
+              returnJSON.Ticketmaster.Info[i] =
+                response.data._embedded.events[i].info
 
-              returnJSON.Ticketmaster.Urls[i] = response.data._embedded.events[i].url
+              returnJSON.Ticketmaster.Urls[i] =
+                response.data._embedded.events[i].url
 
-              returnJSON.Ticketmaster.Images[i] = response.data._embedded.events[i].images[1].url
+              returnJSON.Ticketmaster.Images[i] =
+                response.data._embedded.events[i].images[1].url
             }
 
               //Return the data to the caller.

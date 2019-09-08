@@ -13,6 +13,7 @@ import ds from "./images/ds.png";
 import ipdata from "./images/favicon.ico";
 import tm from "./images/tm.png";
 
+
 //Arrays that are required for the cards
 let names = [];
 let images = [];
@@ -26,7 +27,9 @@ function App() {
   const [temp, setTemp] = useState("");
   const [city, setCity] = useState("");
   const [wind, setWind] = useState("");
+  const [bearing, setBearing] = useState("");
   const [hidden, setHidden] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [icon, setIcon] = useState("");
   const [summary, setSummary] = useState("");
   const [cards, setCards] = useState([]);
@@ -49,8 +52,9 @@ function App() {
         setCity(res.Ipdata.City);
         setSummary(res.Darksky.Currently.Summary);
         setTemp(res.Darksky.Currently.Temperature);
-        setWind(res.Darksky.Currently.Wind)
+        setWind((res.Darksky.Currently.Wind * 1.944).toFixed(1))
         setIcon(res.Darksky.Currently.Icon);
+        setBearing(res.Darksky.Currently.WindBearing)
       })
       .then(() => {
         // Holds the information before the Hook populates the cards array
@@ -88,7 +92,7 @@ function App() {
         <Container>
           {/* Navbar Title */}
           <Row>
-            <Col md="auto">
+            <Col md="auto" >
               <Navbar.Brand>
                 <h1>EventWeather</h1>
                 <h6>Events and weather for your day out.</h6>
@@ -114,6 +118,9 @@ function App() {
             </Col>
             <Col md="auto" className="weather-report">
               {temp} °C
+            </Col>
+            <Col md="auto" className="weather-report">
+              {wind} knots {bearing}
             </Col>
           </Row>
         </Container>

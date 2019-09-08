@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "create-react-app": "^3.1.1",
     "debug": "~2.6.9",
+    "degrees-to-direction": "^1.1.1",
     "express": "~4.16.1",
     "express-ip": "^1.0.3",
     "handlebars": "^4.1.2",
