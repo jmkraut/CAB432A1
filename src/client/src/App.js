@@ -13,8 +13,7 @@ import ds from "./images/ds.png";
 import ipdata from "./images/favicon.ico";
 import tm from "./images/tm.png";
 
-
-//Arrays that are required for the cards 
+//Arrays that are required for the cards
 let names = [];
 let images = [];
 let info = [];
@@ -23,10 +22,10 @@ let venues = [];
 let dates = [];
 
 function App() {
-
   //These hooks populate the page after it has already loaded.
   const [temp, setTemp] = useState("");
   const [city, setCity] = useState("");
+  const [wind, setWind] = useState("");
   const [hidden, setHidden] = useState(false);
   const [icon, setIcon] = useState("");
   const [summary, setSummary] = useState("");
@@ -36,22 +35,22 @@ function App() {
     fetch("http://localhost:3001/")
       .then(res => res.json())
       .then(res => {
-
         //Places the data into arrays for the cards array
-        for (let i = 0; i < res.ticketmaster._embedded.events.length; i++) {
-          names.push(res.ticketmaster._embedded.events[i].name);
-          images.push(res.ticketmaster._embedded.events[i].images[1].url);
-          info.push(res.ticketmaster._embedded.events[i].info);
-          urls.push(res.ticketmaster._embedded.events[i].url);
-          venues.push(res.ticketmaster._embedded.events[i]._embedded.venues[0].name);
-          dates.push(res.ticketmaster._embedded.events[i].dates.start.localDate.split("-").reverse().join("-"))
+        for (let i = 0; i < 20; i++) {
+          names.push(res.Ticketmaster.Names[i]);
+          images.push(res.Ticketmaster.Images[i]);
+          info.push(res.Ticketmaster.Info[i]);
+          urls.push(res.Ticketmaster.Urls[i]);
+          venues.push(res.Ticketmaster.Venues[i]);
+          dates.push(res.Ticketmaster.Dates[i]);
         }
 
         setHidden(true);
-        setTemp(((res.darksky.currently.temperature - 32) / 1.8).toFixed(1));
-        setCity(res.ipdata.city);
-        setIcon(res.darksky.currently.icon.replace(/-/g, "_").toUpperCase());
-        setSummary(res.darksky.currently.summary)
+        setCity(res.Ipdata.City);
+        setSummary(res.Darksky.Currently.Summary);
+        setTemp(res.Darksky.Currently.Temperature);
+        setWind(res.Darksky.Currently.Wind)
+        setIcon(res.Darksky.Currently.Icon);
       })
       .then(() => {
         // Holds the information before the Hook populates the cards array
@@ -62,7 +61,7 @@ function App() {
           tempcards.push(
             <Card style={{ width: "18rem" }} className="card">
               <Card.Header>{names[i]}</Card.Header>
-              <Card.Img variant="top" className ="card-image" src={images[i]} />
+              <Card.Img variant="top" className="card-image" src={images[i]} />
               <br />
               <Card.Title>{venues[i]}</Card.Title>
               <Card.Title>{dates[i]}</Card.Title>
@@ -74,12 +73,11 @@ function App() {
               </Card.Footer>
             </Card>
           );
-    }
+        }
 
-    // Hook that populates the actual cards array
-    setCards(tempcards)
-
-      })
+        // Hook that populates the actual cards array
+        setCards(tempcards);
+      });
   }, []);
 
   return (
@@ -115,7 +113,6 @@ function App() {
               {summary}
             </Col>
             <Col md="auto" className="weather-report">
-              {" "}
               {temp} °C
             </Col>
           </Row>

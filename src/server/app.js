@@ -18,9 +18,25 @@ let clientIP = "";
 
 //Variable required to send information to the client side.
 let returnJSON = {
-  ipdata: {},
-  darksky: {},
-  ticketmaster: {}
+  Ipdata: {
+    City: {}
+  },
+  Darksky: {
+    Currently: {
+      Summary:{},
+      Temperature: {},
+      Wind: {},
+      Icon: {}
+    },
+  },
+  Ticketmaster: {
+    Names: [],
+    Venues: [],
+    Dates: [],
+    Info: [],
+    Urls: [],
+    Images: []
+  }
 };
 
 // URLs that data will be fetched from.
@@ -48,18 +64,59 @@ server.get('/', (req, res) => {
 
   axios.get(ipdataurl)
     .then(function (response) {
+      //Lat and Long for the Darksky API
       latitude = response.data.latitude
       longitude = response.data.longitude
+
+      //City variable for the ticketmaster API
+      //and placing it into the JSON object to be returned
       city = response.data.city
-      returnJSON.ipdata = response.data
+      returnJSON.Ipdata.City = response.data.city
       
-      axios.get(darkskyurl + latitude + "," + longitude)
+      //Call to the Darksky API and map data to the
+      //JSON object to be returned.
+      axios.get(darkskyurl + latitude + "," + longitude + "?" + 
+      "?&units=si&exclude=minutely,hourly,daily,alerts,flags")
         .then(function (response) {
-          returnJSON.darksky = response.data;
+
+          //Trim down all the returned data to only
+          //what is required for the front end.
+          returnJSON.Darksky.Currently.Summary = response.data.currently.summary
+
+          returnJSON.Darksky.Currently.Temperature = response.data.currently.temperature.toFixed(1)
+
+          returnJSON.Darksky.Currently.Wind = response.data.currently.windSpeed
+
+          //Corrects the format from e.g clear-day to
+          //CLEAR_DAY for the front end.
+          returnJSON.Darksky.Currently.Icon = response.data.currently.icon.replace(/-/g, "_").toUpperCase();
         
+          //Call to the Ticketmaster API and map data to the
+          //JSON object to be returned. Once complete returns
+          //the JSON object.
           axios.get(ticketmasterurl + city)
           .then(function (response) {
-              returnJSON.ticketmaster = response.data;
+              
+          //Trim down all the returned data to only
+          //what is required for the front end.
+            for(let i = 0; i < response.data._embedded.events.length; i++){
+
+              returnJSON.Ticketmaster.Names[i] = response.data._embedded.events[i].name
+              
+              returnJSON.Ticketmaster.Venues[i] = response.data._embedded.events[i]._embedded.venues[0].name
+              
+              //The split and reverse corrects the format
+              // from yyyy-mm-dd to dd-mm-yyyy
+              returnJSON.Ticketmaster.Dates[i] = response.data._embedded.events[i].dates.start.localDate.split("-").reverse().join("-")
+
+              returnJSON.Ticketmaster.Info[i] = response.data._embedded.events[i].info
+
+              returnJSON.Ticketmaster.Urls[i] = response.data._embedded.events[i].url
+
+              returnJSON.Ticketmaster.Images[i] = response.data._embedded.events[i].images[1].url
+            }
+
+              //Return the data to the caller.
               res.send(returnJSON);
           })
           .catch(function (error) {
