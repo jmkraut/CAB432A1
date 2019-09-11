@@ -40,6 +40,16 @@
   margin-top: 25px;
 }
 
+.spinner{
+  margin-top: 25px;
+  margin-right: 20px;
+}
+
+.loading{
+  color:whitesmoke;
+  margin-top: 20px;
+}
+
 body{
   background-color: whitesmoke;
   font-family: 'Livvic', sans-serif;

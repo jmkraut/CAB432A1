@@ -49,6 +49,7 @@ function App() {
         }
 
         setHidden(true);
+        setLoading(false);
         setCity(res.Ipdata.City);
         setSummary(res.Darksky.Currently.Summary);
         setTemp(res.Darksky.Currently.Temperature);
@@ -92,7 +93,7 @@ function App() {
         <Container>
           {/* Navbar Title */}
           <Row>
-            <Col md="auto" >
+            <Col md="auto">
               <Navbar.Brand>
                 <h1>EventWeather</h1>
                 <h6>Events and weather for your day out.</h6>
@@ -110,16 +111,28 @@ function App() {
               </Navbar.Brand>
             </Col>
             {/* Weather report section */}
-            <Col md="auto" className="weather-report">
+            {/* Spinner to indicate loading, hides after the page is populated. */}
+
+            <Spinner
+              className="spinner"
+              animation="border"
+              hidden={hidden}
+              variant="light"
+            />
+            <span className="loading" hidden={hidden}>
+              Loading...
+            </span>
+
+            <Col md="auto" className="weather-report" hidden={loading}>
               <strong>{city}</strong>
             </Col>
-            <Col md="auto" className="weather-report">
+            <Col md="auto" className="weather-report" hidden={loading}>
               {summary}
             </Col>
-            <Col md="auto" className="weather-report">
+            <Col md="auto" className="weather-report" hidden={loading}>
               {temp} °C
             </Col>
-            <Col md="auto" className="weather-report">
+            <Col md="auto" className="weather-report" hidden={loading}>
               {wind} knots {bearing}
             </Col>
           </Row>
@@ -127,7 +140,9 @@ function App() {
       </Navbar>
 
       {/* Renders the cards array into the columns */}
-      <CardColumns className="card-columns">{cards}</CardColumns>
+      <CardColumns className="card-columns" hidden={loading}>
+        {cards}
+      </CardColumns>
 
       {/* Bottom Navbar Construction */}
       <Navbar bg="dark" variant="dark" sticky="bottom">
