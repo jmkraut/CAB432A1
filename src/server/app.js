@@ -47,6 +47,7 @@ let darkskyurl = "https://api.darksky.net/forecast/8871d1e0a911accaa06df49bd016b
 let ticketmasterurl = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=4OMcMtE7RsqOGgvSIuMpVPKQMmf4IHib&size=20&city="
 
 //MIDDLEWARE IMPLEMENTATION
+server.use(express.static(path.join(__dirname, 'build')));
 server.use(logger('dev'));
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
@@ -58,17 +59,19 @@ server.use(cors());
 server.use(helmet())
 
 //DEFAULT SERVER PAGE
-server.get('/', (req, res) => {
+server.get('/api', (req, res) => {
 
   // This quickly grabs the requesting 
   // clients IP to parse into the fetches.
   clientIP = requestIP.getClientIp(req);
+  console.log(clientIP);
 
   axios.get(ipdataurl)
     .then(function (response) {
       //Lat and Long for the Darksky API
       latitude = response.data.latitude
       longitude = response.data.longitude
+      
 
       //City variable for the ticketmaster API
       //and placing it into the JSON object to be returned
@@ -142,8 +145,12 @@ server.get('/', (req, res) => {
     });
 })
 
-server.listen(3001, () => 
-  console.log("Listening on port 3001!")
+server.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname+'/build/index.html'));
+})
+
+server.listen(3000, () => 
+  console.log("Listening on port 3000!")
 )
 
 module.exports = server;

@@ -35,7 +35,7 @@ function App() {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/")
+    fetch("/api")
       .then(res => res.json())
       .then(res => {
         //Places the data into arrays for the cards array
