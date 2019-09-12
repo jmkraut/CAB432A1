@@ -22,6 +22,9 @@ let urls = [];
 let venues = [];
 let dates = [];
 
+
+let testurl = "http://localhost:3000/api"
+let deploymenturl = "/api"
 function App() {
   //These hooks populate the page after it has already loaded.
   const [temp, setTemp] = useState("");
@@ -35,7 +38,7 @@ function App() {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    fetch("/api")
+    fetch(deploymenturl)
       .then(res => res.json())
       .then(res => {
         //Places the data into arrays for the cards array
@@ -53,9 +56,9 @@ function App() {
         setCity(res.Ipdata.City);
         setSummary(res.Darksky.Currently.Summary);
         setTemp(res.Darksky.Currently.Temperature);
-        setWind((res.Darksky.Currently.Wind * 1.944).toFixed(1))
+        setWind((res.Darksky.Currently.Wind * 1.944).toFixed(1));
         setIcon(res.Darksky.Currently.Icon);
-        setBearing(res.Darksky.Currently.WindBearing)
+        setBearing(res.Darksky.Currently.WindBearing);
       })
       .then(() => {
         // Holds the information before the Hook populates the cards array
@@ -82,7 +85,8 @@ function App() {
 
         // Hook that populates the actual cards array
         setCards(tempcards);
-      });
+      })
+
   }, []);
 
   return (

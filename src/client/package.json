@@ -17,7 +17,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "move": "rm -r ../server/build && mv build ../server/",
-    "deploy": "npm build && npm move"
+    "deploy": "npm run build && npm run move"
   },
   "eslintConfig": {
     "extends": "react-app"
