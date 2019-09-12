@@ -45,14 +45,14 @@ server.use(express.static(path.join(__dirname, 'build')));
 server.use(logger('dev'));
 server.use(express.json());
 server.use(express.urlencoded({ extended: false }));
-server.use(bodyParser.urlencoded({ extended: false }))
-server.use(bodyParser.json())
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
 server.use(cookieParser());
 server.use(express.static(path.join(__dirname, 'public')));
 server.use(cors());
-server.use(helmet())
-server.enable('trust proxy')
-server.set('trust proxy', true)
+server.use(helmet());
+server.use(requestIP.mw());
+server.set('trust proxy', true);
 
 //DEFAULT SERVER PAGE
 server.get('/api', (req, res) => {
@@ -60,6 +60,10 @@ server.get('/api', (req, res) => {
   // This quickly grabs the requesting 
   // clients IP to parse into the fetches.
   let clientIP = req.ip;
+  if(clientIP = "" || "::f" || "127.0.0.1"){
+    clientIP = req.clientIp;
+    res.send(clientIP);
+  }
 
   // URLs that data will be fetched from.
   let ipdataurl = "https://api.ipdata.co/" + clientIP + "?api-key=74dc719f974815bd528cf30c7bc844f6bbf550b4357db6dd5537bae1"
