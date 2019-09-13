@@ -23,7 +23,7 @@ let venues = [];
 let dates = [];
 
 
-let testurl = "http://localhost:3000/api"
+let testurl = "http://localhost:3001/api"
 let deploymenturl = "/api"
 function App() {
   //These hooks populate the page after it has already loaded.
@@ -40,6 +40,11 @@ function App() {
   useEffect(() => {
     fetch(deploymenturl)
       .then(res => res.json())
+
+      .catch((error) => {
+        console.log(error);
+        
+      })
       .then(res => {
         //Places the data into arrays for the cards array
         for (let i = 0; i < 20; i++) {

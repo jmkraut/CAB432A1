@@ -8,8 +8,8 @@ const logger = require('morgan');
 const server = express();
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const requestIP = require('request-ip');
 const d2d = require('degrees-to-direction')
+const requestIp = require("request-ip");
 
 //Variables required to parse into some of the APIs
 let latitude = "";
@@ -51,7 +51,6 @@ server.use(cookieParser());
 server.use(express.static(path.join(__dirname, 'public')));
 server.use(cors());
 server.use(helmet());
-server.use(requestIP.mw());
 server.set('trust proxy', true);
 
 //DEFAULT SERVER PAGE
@@ -59,14 +58,14 @@ server.get('/api', (req, res) => {
 
   // This quickly grabs the requesting 
   // clients IP to parse into the fetches.
-  let clientIP = req.ip;
-  if(clientIP = "" || "::f" || "127.0.0.1"){
-    clientIP = req.clientIp;
-    res.send(clientIP);
-  }
+  const clientIP = requestIp.getClientIp(req).replace("::ffff:", "").replace("::1", "");
+  console.log(clientIP)
 
   // URLs that data will be fetched from.
-  let ipdataurl = "https://api.ipdata.co/" + clientIP + "?api-key=74dc719f974815bd528cf30c7bc844f6bbf550b4357db6dd5537bae1"
+  let ipdataurl =
+    "https://api.ipdata.co/" +
+    clientIP +
+    "?api-key=74dc719f974815bd528cf30c7bc844f6bbf550b4357db6dd5537bae1";
   let darkskyurl = "https://api.darksky.net/forecast/8871d1e0a911accaa06df49bd016b42e/"
   let ticketmasterurl = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=4OMcMtE7RsqOGgvSIuMpVPKQMmf4IHib&size=20&city="
 
@@ -75,7 +74,6 @@ server.get('/api', (req, res) => {
       //Lat and Long for the Darksky API
       latitude = response.data.latitude
       longitude = response.data.longitude
-      
 
       //City variable for the ticketmaster API
       //and placing it into the JSON object to be returned
@@ -134,7 +132,7 @@ server.get('/api', (req, res) => {
             }
 
               //Return the data to the caller.
-              res.send(returnJSON);
+            res.send(returnJSON);
           })
           .catch(function (error) {
             console.log(error)
@@ -153,8 +151,8 @@ server.get('/', (req, res) => {
   res.sendFile(path.join(__dirname+'/build/index.html'));
 })
 
-server.listen(3000, () => 
-  console.log("Listening on port 3000!")
+server.listen(3001, () => 
+  console.log("Listening on port 3001!")
 )
 
 module.exports = server;
