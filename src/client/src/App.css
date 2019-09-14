@@ -4,15 +4,9 @@
   height: 100%;
 }
 
-.Topbar{
+.topbar{
   font-family: 'Livvic', sans-serif;
   font-size: 2em;
-}
-
-.WeatherCard{
-  font-size: 20px;
-  margin: 0px;
-  background-color: whitesmoke;
 }
 
 .card{
@@ -22,7 +16,7 @@
 }
 
 .card-columns{
-  margin: 80px;
+  margin: 20px;
 }
 
 .card-info{
@@ -32,6 +26,12 @@
 
 .card-image{
   margin-bottom: 20px;
+}
+
+.card-title{
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
 }
 
 .weather-report{
@@ -49,12 +49,12 @@
   color:whitesmoke;
   margin-top: 20px;
 }
+.cards-error{
+  text-align: center;
+  margin: 50px;
+}
 
 body{
   background-color: whitesmoke;
   font-family: 'Livvic', sans-serif;
-}
-
-.NavCard{
-  font-size: 1em;
 }

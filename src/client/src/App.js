@@ -13,67 +13,95 @@ import ds from "./images/ds.png";
 import ipdata from "./images/favicon.ico";
 import tm from "./images/tm.png";
 
-
-//Arrays that are required for the cards
-let names = [];
-let images = [];
-let info = [];
-let urls = [];
-let venues = [];
-let dates = [];
-
-
-let testurl = "http://localhost:3001/api"
-let deploymenturl = "/api"
 function App() {
+  //Arrays that are required for the cards
+  let names = [];
+  let images = [];
+  let info = [];
+  let urls = [];
+  let venues = [];
+  let dates = [];
+  
   //These hooks populate the page after it has already loaded.
   const [temp, setTemp] = useState("");
   const [city, setCity] = useState("");
   const [wind, setWind] = useState("");
   const [bearing, setBearing] = useState("");
-  const [hidden, setHidden] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [icon, setIcon] = useState("");
   const [summary, setSummary] = useState("");
+  const [hidden, setHidden] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [cards, setCards] = useState([]);
+  const [locationerror, setLocationError] = useState(true);
+  const [eventserror, setEventsError] = useState(true);
 
   useEffect(() => {
-    fetch(deploymenturl)
-      .then(res => res.json())
-
-      .catch((error) => {
-        console.log(error);
-        
+    fetch("/api")
+      .then((res) => res.json())
+      // Error handling prevents any further progress if
+      // the initial fetch fails.
+      .catch((err) => {
+        console.log(err)
+        setLocationError(false);
+        setHidden(true);
       })
-      .then(res => {
+      .then((res) => {
         //Places the data into arrays for the cards array
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < res.Ticketmaster.NumOfEvents; i++) {
           names.push(res.Ticketmaster.Names[i]);
           images.push(res.Ticketmaster.Images[i]);
+
+          //Quick check to fill in the info section if none is available.
+          if (res.Ticketmaster.Info[i] === "" ||
+            res.Ticketmaster.Info[i] === null ||
+            res.Ticketmaster.Info.length === 0)
+          {
+            res.Ticketmaster.Info[i] = "No information provided.";
+          }
+
           info.push(res.Ticketmaster.Info[i]);
           urls.push(res.Ticketmaster.Urls[i]);
           venues.push(res.Ticketmaster.Venues[i]);
           dates.push(res.Ticketmaster.Dates[i]);
         }
 
+        // Error handling, check to make sure data exists for
+        // the weather report section.
+        if (
+          res.Ipdata.City === "" ||
+          res.Ipdata.City === null ||
+          res.Darksky.Currently.Summary === "" ||
+          res.Darksky.Currently.Temperature === "" ||
+          res.Darksky.Currently.Wind === "" ||
+          res.Darksky.Currently.Icon === "" ||
+          res.Darksky.Currently.WindBearing === ""
+        ) {
+          setLocationError(false);
+          setEventsError(false);
+          setHidden(true);
+        } else {
+          setLoading(false);
+        }
+        
+        // Hooks that set the data and remove loading symbols once complete
         setHidden(true);
-        setLoading(false);
         setCity(res.Ipdata.City);
         setSummary(res.Darksky.Currently.Summary);
         setTemp(res.Darksky.Currently.Temperature);
         setWind((res.Darksky.Currently.Wind * 1.944).toFixed(1));
         setIcon(res.Darksky.Currently.Icon);
         setBearing(res.Darksky.Currently.WindBearing);
-      })
-      .then(() => {
+      
         // Holds the information before the Hook populates the cards array
         let tempcards = [];
 
+        // Check to make sure the result actually returned data.
+        if (res.Ticketmaster.NumOfEvents !== 0) {
         // Populates the tempcards array
-        for (let i = 0; i < names.length; i++) {
+        for (let i = 0; i < res.Ticketmaster.NumOfEvents; i++) {
           tempcards.push(
-            <Card style={{ width: "18rem" }} className="card">
-              <Card.Header>{names[i]}</Card.Header>
+            <Card className="card">
+              <Card.Header className="card-title">{names[i]}</Card.Header>
               <Card.Img variant="top" className="card-image" src={images[i]} />
               <br />
               <Card.Title>{venues[i]}</Card.Title>
@@ -89,15 +117,25 @@ function App() {
         }
 
         // Hook that populates the actual cards array
-        setCards(tempcards);
-      })
+          setCards(tempcards);
+        }
 
+        // Error handling, shows an error in the cards section
+        // if there is any problems.
+        else {
+          setEventsError(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        setEventsError(false);
+      })
   }, []);
 
   return (
     <div>
       {/* Top Navbar Construction */}
-      <Navbar className="Topbar" bg="dark" variant="dark" sticky="top">
+      <Navbar className="topbar" bg="dark" variant="dark" sticky="top">
         {/* Separate the navbar into 3 columns */}
         <Container>
           {/* Navbar Title */}
@@ -121,7 +159,6 @@ function App() {
             </Col>
             {/* Weather report section */}
             {/* Spinner to indicate loading, hides after the page is populated. */}
-
             <Spinner
               className="spinner"
               animation="border"
@@ -132,6 +169,12 @@ function App() {
               Loading...
             </span>
 
+            {/* Appears if there's an issue with the weather data. */}
+            <strong hidden={locationerror} className="loading">
+              Sorry! Something went wrong :(
+            </strong>
+            
+            {/* City and weather data. */}
             <Col md="auto" className="weather-report" hidden={loading}>
               <strong>{city}</strong>
             </Col>
@@ -152,6 +195,11 @@ function App() {
       <CardColumns className="card-columns" hidden={loading}>
         {cards}
       </CardColumns>
+      
+      {/* Appears if there's an issue with the events data */}
+      <h2 hidden={eventserror} className="cards-error">
+        Sorry! Something went wrong or we couldn't find any events :(
+      </h2>
 
       {/* Bottom Navbar Construction */}
       <Navbar bg="dark" variant="dark" sticky="bottom">
